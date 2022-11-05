@@ -22,7 +22,6 @@ body {
   background-color: var(--background);
   --webkit-font-smoothing: antialiased;
   font-family: Inter, sans-serif;
-  color: rgba(255, 255, 255, 0.87);
 }
 
 button {
