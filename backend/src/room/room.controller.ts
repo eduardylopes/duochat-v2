@@ -18,7 +18,7 @@ import { RoomService } from './room.service';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { CreateRoomRequestDto } from './dto/create-room-request-dto';
+import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomDto } from './dto/room.dto';
 import { OwnershipGuard } from './guards/ownership.guard';
 import { RequestWithUser } from './interfaces/request-with-user.interface';
@@ -44,13 +44,10 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
-    @Body() createRoomDto: CreateRoomRequestDto,
+    @Body() createRoomDto: CreateRoomDto,
     @Req() req: RequestWithUser,
   ) {
-    const room = await this.roomService.create({
-      ...createRoomDto,
-      ownerId: req.user.id,
-    });
+    const room = await this.roomService.create(createRoomDto, req.user.id);
 
     return room;
   }

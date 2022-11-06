@@ -18,13 +18,13 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll() {
+  public async findAll() {
     const users = await this.userRepository.find();
 
     return users;
   }
 
-  async findOne(id: string) {
+  public async findOne(id: string) {
     const user = await this.userRepository.findOne(id, {
       relations: ['room'],
     });
@@ -36,13 +36,13 @@ export class UserService {
     return user;
   }
 
-  async findOneByUsername(username: string) {
+  public async findOneByUsername(username: string) {
     const user = await this.userRepository.findOne({ username });
 
     return user;
   }
 
-  async create(createUserDto: CreateUserDto) {
+  public async create(createUserDto: CreateUserDto) {
     const user = this.userRepository.create({
       ...createUserDto,
     });
@@ -52,7 +52,7 @@ export class UserService {
     return newUser;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  public async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.preload({
       id,
       ...updateUserDto,
@@ -65,7 +65,7 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async updateUserRoom(id: string, room: Room) {
+  public async updateUserRoom(id: string, room: Room) {
     const user = await this.userRepository.preload({
       id,
       room,
@@ -86,7 +86,7 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async remove(id: string) {
+  public async remove(id: string) {
     const user = await this.findOne(id);
 
     return this.userRepository.remove(user);

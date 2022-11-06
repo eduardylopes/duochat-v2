@@ -15,9 +15,6 @@ export class CreateRoomDto {
   @IsBoolean()
   readonly isPrivate: boolean;
 
-  @IsString()
-  readonly ownerId: string;
-
   @IsNumber()
   readonly maxUsers: number;
 }

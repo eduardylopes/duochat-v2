@@ -1,7 +1,7 @@
 import {
   Injectable,
-  UnauthorizedException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
@@ -9,9 +9,9 @@ import * as bcrypt from 'bcryptjs';
 
 import { UserService } from 'src/user/user.service';
 
-import { User } from 'src/user/entities/user.entity';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async singUp(userDto: CreateUserDto) {
+  public async singUp(userDto: CreateUserDto) {
     const candidate = await this.userService.findOneByUsername(
       userDto.username,
     );
@@ -38,7 +38,7 @@ export class AuthService {
     return tokens;
   }
 
-  async signIn(userDto: LoginUserDto) {
+  public async signIn(userDto: LoginUserDto) {
     const user = await this.userService.findOneByUsername(userDto.username);
 
     const tokens = await this.generateTokens(user.id);
@@ -46,7 +46,7 @@ export class AuthService {
     return tokens;
   }
 
-  async validateUser(userDto: LoginUserDto): Promise<User> {
+  public async validateUser(userDto: LoginUserDto): Promise<User> {
     const user = await this.userService.findOneByUsername(userDto.username);
 
     if (!user) {
@@ -63,7 +63,7 @@ export class AuthService {
     throw new UnauthorizedException({ message: 'Incorrect password' });
   }
 
-  verifyAccessToken(accessToken: string) {
+  public verifyAccessToken(accessToken: string) {
     try {
       const payload = this.jwtService.verify(accessToken, {
         secret: process.env.JWT_ACCESS_SECRET,
@@ -75,7 +75,7 @@ export class AuthService {
     }
   }
 
-  verifyRefreshToken(refreshToken: string) {
+  private verifyRefreshToken(refreshToken: string) {
     const payload = this.jwtService.verify(refreshToken, {
       secret: process.env.JWT_REFRESH_SECRET,
     });
@@ -83,7 +83,7 @@ export class AuthService {
     return payload;
   }
 
-  async updateAccessToken(refreshToken: string) {
+  public async updateAccessToken(refreshToken: string) {
     try {
       const userId = this.verifyRefreshToken(refreshToken);
 

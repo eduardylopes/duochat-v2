@@ -4,6 +4,6 @@ export class RoomDto {
   public description: string;
   public isPrivate: boolean;
   public ownerId: string;
-  createdAt: string;
-  updatedAt: string;
+  public createdAt: string;
+  public updatedAt: string;
 }

@@ -17,8 +17,8 @@ import { BanUserDto } from 'src/chat/dto/ban-user.dto';
 import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
-import { CreateRoomDto } from 'src/room/dto/create-room.dto';
 import { UpdateRoomDto } from 'src/room/dto/update-room.dto';
+import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomDto } from './dto/room.dto';
 
 @Injectable()
@@ -48,7 +48,7 @@ export class RoomService {
     return new PageDto(entities, pageMetaDto);
   }
 
-  async findOne(id: string) {
+  public async findOne(id: string) {
     const room = await this.roomRepository.findOne(id);
 
     if (!room) {
@@ -58,7 +58,7 @@ export class RoomService {
     return room;
   }
 
-  async findOneWithRelations(id: string) {
+  public async findOneWithRelations(id: string) {
     const room = await this.roomRepository.findOne(id, {
       relations: ['messages', 'users', 'bannedUsers'],
     });
@@ -70,30 +70,30 @@ export class RoomService {
     return room;
   }
 
-  async findOneByName(name: string) {
+  public async findOneByName(name: string) {
     const room = await this.roomRepository.findOne({ name });
 
     return room;
   }
 
-  async create(createRoomDto: CreateRoomDto) {
+  public async create(createRoomDto: CreateRoomDto, ownerId: string) {
     const roomAlreadyExists = await this.findOneByName(createRoomDto.name);
 
     if (roomAlreadyExists) {
       throw new BadRequestException('Room already exists');
     }
 
-    const room = this.roomRepository.create(createRoomDto);
+    const room = this.roomRepository.create({ ...createRoomDto, ownerId });
     return this.roomRepository.save(room);
   }
 
-  async addMessage(addMessageDto: AddMessageDto) {
+  public async addMessage(addMessageDto: AddMessageDto) {
     const { roomId, userId, text } = addMessageDto;
 
     const room = await this.findOne(roomId);
     const user = await this.userService.findOne(userId);
 
-    const message = await this.messageRepository.create({
+    const message = this.messageRepository.create({
       text,
       room,
       user,
@@ -102,7 +102,7 @@ export class RoomService {
     return this.messageRepository.save(message);
   }
 
-  async update(id: string, updateRoomDto: UpdateRoomDto) {
+  public async update(id: string, updateRoomDto: UpdateRoomDto) {
     const room = await this.roomRepository.preload({
       id,
       ...updateRoomDto,
@@ -115,7 +115,7 @@ export class RoomService {
     return this.roomRepository.save(room);
   }
 
-  async banUserFromRoom(banUserDto: BanUserDto) {
+  public async banUserFromRoom(banUserDto: BanUserDto) {
     const { userId, roomId } = banUserDto;
 
     const user = await this.userService.findOne(userId);
@@ -132,7 +132,7 @@ export class RoomService {
     return this.roomRepository.save(updatedRoom);
   }
 
-  async remove(id: string) {
+  public async remove(id: string) {
     const room = await this.findOne(id);
 
     return this.roomRepository.remove(room);
