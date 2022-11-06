@@ -4,16 +4,13 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  Req,
-  Res,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 
-import { Request, Response } from 'express';
-
 import { AuthService } from './auth.service';
 
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LocalAuthGuard } from '../guards/local-auth.guard';
 
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';
@@ -23,10 +20,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/signUp')
-  async singUp(
-    @Body() userDto: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async singUp(@Body() userDto: CreateUserDto) {
     const tokens = await this.authService.singUp(userDto);
 
     if (!tokens) {
@@ -36,34 +30,20 @@ export class AuthController {
       );
     }
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
-
     return tokens;
   }
 
   @Post('/signIn')
   @UseGuards(LocalAuthGuard)
-  async singIn(
-    @Body() userDto: LoginUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async singIn(@Body() userDto: LoginUserDto) {
     const tokens = await this.authService.signIn(userDto);
-
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
 
     return tokens;
   }
 
-  @Post('/update')
-  async updateTokens(@Req() req: Request) {
-    const { refreshToken } = req.cookies;
-
+  @Post('/refresh')
+  async updateTokens(@Request() req: any) {
+    const refreshToken = req.headers.authorization.replace('Bearer ', '');
     const accessToken = await this.authService.updateAccessToken(refreshToken);
 
     if (!accessToken) {

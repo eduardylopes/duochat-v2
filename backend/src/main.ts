@@ -13,14 +13,14 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  app.enableCors();
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
     }),
   );
-
-  // app.useWebSocketAdapter(new AuthIoAdapter(app));
 
   const options = new DocumentBuilder()
     .setTitle('Realtime Chat')

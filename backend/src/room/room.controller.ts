@@ -16,7 +16,7 @@ import { RequestWithUser } from './interfaces/request-with-user.interface';
 
 import { RoomService } from './room.service';
 
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { OwnershipGuard } from './guards/ownership.guard';
 
 @Controller('room')

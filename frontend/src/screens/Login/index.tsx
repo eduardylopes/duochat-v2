@@ -1,8 +1,17 @@
-import { Button, Stack } from 'react-bootstrap';
-import { Field, Form as FinalForm } from 'react-final-form';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Stack,
+  useToast,
+} from '@chakra-ui/react';
+import { Field, Form, Formik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import ValidateSchema from '../../helpers/ValidateSchema';
-import { Container, Form } from './styles';
+import { signIn } from '../../services/auth';
 
 const loginSchema = Yup.object({
   username: Yup.string().required('Username is required'),
@@ -10,62 +19,87 @@ const loginSchema = Yup.object({
 });
 
 export function Login() {
-  const onSubmit = (values: any) => {
-    console.log(values);
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (values: any) => {
+    const { username, password } = values;
+
+    try {
+      await signIn(username, password);
+      toast({
+        title: 'User has successfully logged in',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
+      navigate('/lobby');
+    } catch (error) {
+      toast({
+        title: 'Username or password incorrect',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
-    <Container>
-      <FinalForm
-        validate={ValidateSchema(loginSchema)}
-        onSubmit={onSubmit}
-        render={({ handleSubmit }) => (
-          <Form onSubmit={handleSubmit}>
-            <Field name="username">
-              {({ input, meta }) => (
-                <Form.Group className="mb-3" controlId="username">
-                  <Form.Label className="text">Username</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter username"
-                    value={input.value}
-                    onChange={input.onChange}
-                  />
-                  {meta.error && (
-                    <Form.Control.Feedback type="invalid">
-                      Please insert a username.
-                    </Form.Control.Feedback>
-                  )}
-                </Form.Group>
-              )}
-            </Field>
-            <Field name="password">
-              {({ input, meta }) => (
-                <Form.Group className="mb-3" controlId="password">
-                  <Form.Label className="text">Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter password"
-                    value={input.value}
-                    onChange={input.onChange}
-                  />
-                  {meta.error && (
-                    <Form.Control.Feedback type="invalid">
-                      Please insert a password.
-                    </Form.Control.Feedback>
-                  )}
-                </Form.Group>
-              )}
-            </Field>
-
-            <Stack>
-              <Button variant="primary" type="submit">
-                Login
-              </Button>
-            </Stack>
-          </Form>
-        )}
-      />
-    </Container>
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      w="100%"
+      h="100%"
+    >
+      <Box bg="gray.100" p={4} borderRadius={8}>
+        <Formik
+          initialValues={{ username: '', password: '' }}
+          onSubmit={handleSubmit}
+          validationSchema={loginSchema}
+        >
+          {(props) => (
+            <Form>
+              <Field name="username">
+                {({ field, form }: any) => (
+                  <FormControl
+                    mb={2}
+                    isInvalid={form.errors.username && form.touched.username}
+                  >
+                    <FormLabel>Username</FormLabel>
+                    <Input {...field} placeholder="username" />
+                    <FormErrorMessage>{form.errors.username}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="password">
+                {({ field, form }: any) => (
+                  <FormControl
+                    isInvalid={form.errors.password && form.touched.password}
+                  >
+                    <FormLabel>Password</FormLabel>
+                    <Input {...field} placeholder="password" type="password" />
+                    <FormErrorMessage>{form.errors.password}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Stack>
+                <Button
+                  mt={4}
+                  colorScheme="telegram"
+                  isLoading={props.isSubmitting}
+                  type="submit"
+                >
+                  Login
+                </Button>
+                <Button mt={4} variant="unstyled" type="button">
+                  Create Account
+                </Button>
+              </Stack>
+            </Form>
+          )}
+        </Formik>
+      </Box>
+    </Box>
   );
 }

@@ -16,7 +16,7 @@ import {
 import { Server, Socket } from 'socket.io';
 
 import { AuthService } from 'src/auth/auth.service';
-import { WsAuthGuard } from 'src/auth/guards/ws-auth.guard';
+import { WsAuthGuard } from 'src/guards/ws-auth.guard';
 import { RoomService } from 'src/room/room.service';
 import { UserService } from 'src/user/user.service';
 
