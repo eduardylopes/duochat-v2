@@ -18,8 +18,7 @@ import {
 import { useUser } from '@contexts/User';
 import LocalStorage from '@helpers/LocalStorage';
 import SessionStorage from '@helpers/SessionStorage';
-import { me } from '@services/auth';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreateRoomModal } from './CreateRoomModal';
 
@@ -35,24 +34,6 @@ export function Header() {
     setUser(null);
     navigate('/auth/login');
   };
-
-  useEffect(() => {
-    async function verifyUser() {
-      if (!user) {
-        try {
-          const { data } = await me();
-          setUser(data);
-        } catch (error: any) {
-          // eslint-disable-next-line no-console
-          console.error(error);
-        } finally {
-          setProcessedAuth(true);
-        }
-      }
-    }
-
-    verifyUser();
-  }, []);
 
   return (
     <Stack

@@ -17,13 +17,16 @@ import {
   SliderThumb,
   SliderTrack,
   Stack,
+  useToast,
 } from '@chakra-ui/react';
+import { createRoom } from '@services/room';
 import { Field, Form, Formik } from 'formik';
 import { MutableRefObject } from 'react';
 import * as Yup from 'yup';
 
 const roomSchema = Yup.object({
-  roomName: Yup.string().required('Room name is required'),
+  name: Yup.string().required('Room name is required'),
+  description: Yup.string(),
   isPrivate: Yup.boolean(),
   password: Yup.string().when('isPrivate', {
     is: true,
@@ -33,7 +36,7 @@ const roomSchema = Yup.object({
   }),
   maxUsers: Yup.number()
     .required('Max users is required')
-    .min(2, "You cant't create a room with less than 2 users"),
+    .min(2, 'Max users must be greater than 2'),
 });
 
 interface CreateRoomModalProps {
@@ -47,12 +50,36 @@ export function CreateRoomModal({
   initialFocusRef,
   ...props
 }: CreateRoomModalProps) {
-  const handleSubmit = (values: any) => {
-    console.log(values);
-    onClose();
-  };
+  const toast = useToast();
 
-  console.count();
+  const handleSubmit = async (values: any) => {
+    try {
+      await createRoom(values);
+      toast({
+        title: 'Room was created successfully',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      onClose();
+    } catch (error: any) {
+      if (error.response.data === 400) {
+        toast({
+          title: 'Room name already exists',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: 'Fail to create room',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    }
+  };
 
   return (
     <Modal {...props} onClose={onClose} initialFocusRef={initialFocusRef}>
@@ -63,7 +90,8 @@ export function CreateRoomModal({
         <ModalBody pb={6}>
           <Formik
             initialValues={{
-              roomName: '',
+              name: '',
+              description: '',
               password: '',
               isPrivate: false,
               maxUsers: 1,
@@ -73,20 +101,41 @@ export function CreateRoomModal({
           >
             {(props) => (
               <Form>
-                <Field name="roomName">
+                <Field name="name">
                   {({ field, form }: any) => (
                     <FormControl
                       mb={4}
-                      isInvalid={form.errors.roomName && form.touched.roomName}
+                      isInvalid={form.errors.name && form.touched.name}
                     >
                       <FormLabel>Room name</FormLabel>
                       <Input
                         {...field}
+                        size="lg"
                         placeholder="room name"
                         ref={initialFocusRef}
                       />
+                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+
+                <Field name="description">
+                  {({ field, form }: any) => (
+                    <FormControl
+                      mb={4}
+                      isInvalid={
+                        form.errors.description && form.touched.description
+                      }
+                    >
+                      <FormLabel>Room description</FormLabel>
+                      <Input
+                        {...field}
+                        size="lg"
+                        placeholder="description"
+                        ref={initialFocusRef}
+                      />
                       <FormErrorMessage>
-                        {form.errors.roomName}
+                        {form.errors.description}
                       </FormErrorMessage>
                     </FormControl>
                   )}
@@ -113,6 +162,7 @@ export function CreateRoomModal({
                         <FormLabel>Password</FormLabel>
                         <Input
                           {...field}
+                          size="lg"
                           placeholder="password"
                           type="password"
                         />

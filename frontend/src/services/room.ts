@@ -6,7 +6,8 @@ export const api = axios.create({
 });
 
 interface ICreateRoomDTO {
-  roomName: string;
+  name: string;
+  description?: string;
   password?: string;
   isPrivate: boolean;
   maxUsers: number;
@@ -17,8 +18,7 @@ interface IUpdateRoomDTO extends ICreateRoomDTO {}
 export const createRoom = async (data: ICreateRoomDTO) => {
   const accessToken = SessionStorage.get('access');
 
-  const response = await api.post('/', {
-    data,
+  const response = await api.post('/room', data, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

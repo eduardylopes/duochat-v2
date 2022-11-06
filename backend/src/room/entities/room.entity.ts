@@ -1,9 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+  CreateDateColumn,
+  Entity,
   ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 import { User } from 'src/user/entities/user.entity';
@@ -20,11 +22,28 @@ export class Room {
   @Column({ length: 60 })
   description: string;
 
-  @Column()
-  avatar: string;
+  @Column({ select: false })
+  password: string;
 
-  @Column('uuid')
+  @Column({ name: 'is_private' })
+  isPrivate: boolean;
+
+  @Column('uuid', { name: 'owner_id' })
   ownerId: string;
+
+  @CreateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+    name: 'created_at',
+  })
+  createdAt: string;
+
+  @UpdateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+    name: 'updated_at',
+  })
+  updatedAt: string;
 
   @OneToMany(() => User, (user: User) => user.room)
   users: Array<User>;

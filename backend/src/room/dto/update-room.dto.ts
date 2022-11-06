@@ -11,5 +11,9 @@ export class UpdateRoomDto {
 
   @IsString()
   @IsOptional()
+  readonly isPrivate?: boolean;
+
+  @IsString()
+  @IsOptional()
   readonly avatar?: string;
 }

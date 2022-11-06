@@ -12,6 +12,7 @@ import { useUser } from '@contexts/User';
 import UseQuery from '@helpers/useQuery';
 import { signIn } from '@services/auth';
 import { Field, Form, Formik } from 'formik';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
@@ -21,7 +22,7 @@ const loginSchema = Yup.object({
 });
 
 export function Login() {
-  const { setUser } = useUser();
+  const { user, processedAuth, setUser } = useUser();
   const toast = useToast();
   const { params } = UseQuery();
   const navigate = useNavigate();
@@ -60,6 +61,11 @@ export function Login() {
     navigate('/auth/register');
   };
 
+  useEffect(() => {
+    console.log(user);
+    if (user) navigate(decodeURIComponent(params.redirect));
+  }, [processedAuth]);
+
   return (
     <Box
       display="flex"
@@ -83,7 +89,7 @@ export function Login() {
                     isInvalid={form.errors.username && form.touched.username}
                   >
                     <FormLabel>Username</FormLabel>
-                    <Input {...field} placeholder="username" />
+                    <Input {...field} size="lg" placeholder="username" />
                     <FormErrorMessage>{form.errors.username}</FormErrorMessage>
                   </FormControl>
                 )}
@@ -94,7 +100,12 @@ export function Login() {
                     isInvalid={form.errors.password && form.touched.password}
                   >
                     <FormLabel>Password</FormLabel>
-                    <Input {...field} placeholder="password" type="password" />
+                    <Input
+                      {...field}
+                      size="lg"
+                      placeholder="password"
+                      type="password"
+                    />
                     <FormErrorMessage>{form.errors.password}</FormErrorMessage>
                   </FormControl>
                 )}

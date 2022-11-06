@@ -1,17 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 
 import { UserService } from 'src/user/user.service';
 
-import { Room } from './entities/room.entity';
 import { Message } from './entities/message.entity';
+import { Room } from './entities/room.entity';
 
 import { AddMessageDto } from 'src/chat/dto/add-message.dto';
+import { BanUserDto } from 'src/chat/dto/ban-user.dto';
+import { PageMetaDto } from 'src/common/dtos/page-meta.dto';
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 import { CreateRoomDto } from 'src/room/dto/create-room.dto';
 import { UpdateRoomDto } from 'src/room/dto/update-room.dto';
-import { BanUserDto } from 'src/chat/dto/ban-user.dto';
+import { RoomDto } from './dto/room.dto';
 
 @Injectable()
 export class RoomService {
@@ -22,10 +30,22 @@ export class RoomService {
     private readonly userService: UserService,
   ) {}
 
-  async findAll() {
-    const rooms = await this.roomRepository.find({ relations: ['messages'] });
+  public async findAll(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<RoomDto>> {
+    const queryBuilder = this.roomRepository.createQueryBuilder('room');
 
-    return rooms;
+    queryBuilder
+      .orderBy('room.createdAt', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take);
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(entities, pageMetaDto);
   }
 
   async findOne(id: string) {
@@ -57,10 +77,13 @@ export class RoomService {
   }
 
   async create(createRoomDto: CreateRoomDto) {
-    const room = await this.roomRepository.create({
-      ...createRoomDto,
-    });
+    const roomAlreadyExists = await this.findOneByName(createRoomDto.name);
 
+    if (roomAlreadyExists) {
+      throw new BadRequestException('Room already exists');
+    }
+
+    const room = this.roomRepository.create(createRoomDto);
     return this.roomRepository.save(room);
   }
 

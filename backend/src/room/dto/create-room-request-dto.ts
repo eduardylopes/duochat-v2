@@ -1,6 +1,6 @@
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreateRoomDto {
+export class CreateRoomRequestDto {
   @IsString()
   readonly name: string;
 
@@ -15,6 +15,7 @@ export class CreateRoomDto {
   @IsBoolean()
   readonly isPrivate: boolean;
 
+  @IsOptional()
   @IsString()
   readonly ownerId: string;
 

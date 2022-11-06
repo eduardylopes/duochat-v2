@@ -1,6 +1,7 @@
 import { Box } from '@chakra-ui/react';
 import { useUser } from '@contexts/User';
-import { ReactNode } from 'react';
+import { me } from '@services/auth';
+import { ReactNode, useEffect } from 'react';
 import { Header } from './Header';
 
 interface TemplateProps {
@@ -8,7 +9,25 @@ interface TemplateProps {
 }
 
 export function Template({ children }: TemplateProps) {
-  const { user } = useUser();
+  const { user, setProcessedAuth, setUser } = useUser();
+
+  useEffect(() => {
+    async function verifyUser() {
+      if (!user) {
+        try {
+          const { data } = await me();
+          setUser(data);
+        } catch (error: any) {
+          // eslint-disable-next-line no-console
+          console.error(error);
+        } finally {
+          setProcessedAuth(true);
+        }
+      }
+    }
+
+    verifyUser();
+  }, []);
 
   return (
     <Box
@@ -19,7 +38,7 @@ export function Template({ children }: TemplateProps) {
       bg="gray.700"
       alignItems="center"
     >
-      <Header />
+      {user && <Header />}
       <Box display="flex" w="1080px" h="100%" px={4} mt={4}>
         {children};
       </Box>

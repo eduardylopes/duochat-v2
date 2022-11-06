@@ -6,18 +6,22 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 
-import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { RequestWithUser } from './interfaces/request-with-user.interface';
 
 import { RoomService } from './room.service';
 
+import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
+import { PageDto } from 'src/common/dtos/page.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { CreateRoomRequestDto } from './dto/create-room-request-dto';
+import { RoomDto } from './dto/room.dto';
 import { OwnershipGuard } from './guards/ownership.guard';
+import { RequestWithUser } from './interfaces/request-with-user.interface';
 
 @Controller('room')
 export class RoomController {
@@ -31,28 +35,29 @@ export class RoomController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async find() {
-    return this.roomService.findAll();
+  async getUsers(
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<RoomDto>> {
+    return this.roomService.findAll(pageOptionsDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
+    @Body() createRoomDto: CreateRoomRequestDto,
     @Req() req: RequestWithUser,
-    @Body() createRoomDto: CreateRoomDto,
   ) {
-    createRoomDto.ownerId = req.user.id;
+    const room = await this.roomService.create({
+      ...createRoomDto,
+      ownerId: req.user.id,
+    });
 
-    return this.roomService.create(createRoomDto);
+    return room;
   }
 
   @UseGuards(JwtAuthGuard, OwnershipGuard)
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Req() req: RequestWithUser,
-    @Body() updateRoomDto: UpdateRoomDto,
-  ) {
+  async update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
     return this.roomService.update(id, updateRoomDto);
   }
 

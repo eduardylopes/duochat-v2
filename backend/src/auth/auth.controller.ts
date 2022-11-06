@@ -43,7 +43,7 @@ export class AuthController {
 
   @Post('/refresh')
   async updateTokens(@Request() req: any) {
-    const refreshToken = req.headers.authorization.replace('Bearer ', '');
+    const refreshToken = req.headers.authorization?.replace('Bearer ', '');
     const accessToken = await this.authService.updateAccessToken(refreshToken);
 
     if (!accessToken) {
