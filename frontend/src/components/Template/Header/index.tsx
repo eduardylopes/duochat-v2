@@ -1,7 +1,8 @@
-import { ChevronDownIcon, SearchIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, PlusSquareIcon, SearchIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
+  Button,
   IconButton,
   Input,
   InputGroup,
@@ -12,16 +13,20 @@ import {
   MenuList,
   Stack,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { useUser } from '@contexts/User';
 import LocalStorage from '@helpers/LocalStorage';
 import SessionStorage from '@helpers/SessionStorage';
 import { me } from '@services/auth';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CreateRoomModal } from './CreateRoomModal';
 
 export function Header() {
   const { user, setUser, setProcessedAuth } = useUser();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const initialRef = useRef(null);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -84,6 +89,19 @@ export function Header() {
             bg="gray.700"
           />
         </InputGroup>
+        <Button
+          colorScheme="green"
+          leftIcon={<PlusSquareIcon />}
+          onClick={onOpen}
+          mr={6}
+        >
+          Create Room
+        </Button>
+        <CreateRoomModal
+          isOpen={isOpen}
+          onClose={onClose}
+          initialFocusRef={initialRef}
+        />
         <Box display="flex" ml="auto" alignItems="center" gap={2}>
           <Avatar
             name={user?.username}
