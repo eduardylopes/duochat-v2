@@ -11,6 +11,8 @@ import {
 import { Field, Form, Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
+import { useUser } from '../../contexts/User';
+import UseQuery from '../../helpers/useQuery';
 import { signIn } from '../../services/auth';
 
 const loginSchema = Yup.object({
@@ -19,7 +21,9 @@ const loginSchema = Yup.object({
 });
 
 export function Login() {
+  const { setUser } = useUser();
   const toast = useToast();
+  const { params } = UseQuery();
   const navigate = useNavigate();
 
   const handleSubmit = async (values: any) => {
@@ -33,6 +37,14 @@ export function Login() {
         duration: 2000,
         isClosable: true,
       });
+
+      setUser({ username });
+
+      if (params.redirect) {
+        navigate(decodeURIComponent(params.redirect));
+        return;
+      }
+
       navigate('/lobby');
     } catch (error) {
       toast({

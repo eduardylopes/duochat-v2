@@ -14,9 +14,17 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useUser } from '../../../contexts/User';
+import LocalStorage from '../../../helpers/LocalStorage';
+import SessionStorage from '../../../helpers/SessionStorage';
 
 export function Header() {
   const { user } = useUser();
+
+  const handleLogout = () => {
+    LocalStorage.clear();
+    SessionStorage.clear();
+    window.location.reload();
+  };
 
   return (
     <Stack
@@ -73,7 +81,7 @@ export function Header() {
               variant="none"
             />
             <MenuList>
-              <MenuItem>Sign Out</MenuItem>
+              <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
             </MenuList>
           </Menu>
         </Box>

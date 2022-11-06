@@ -31,7 +31,7 @@ export function Template({ children }: TemplateProps) {
 
   return (
     <Box display="flex" w="100vw" h="100vh" bg="gray.700" pos="relative">
-      <Header />
+      {user && <Header />}
       {children};
     </Box>
   );
