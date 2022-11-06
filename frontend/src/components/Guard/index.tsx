@@ -16,7 +16,7 @@ export function Guard({ element }: GuardProps) {
 
   useEffect(() => {
     const execute = async () => {
-      if (!processedAuth || loading) {
+      if (processedAuth) {
         setLoading(false);
       } else {
         setLoading(true);

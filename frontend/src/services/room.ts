@@ -1,11 +1,13 @@
 import SessionStorage from '@helpers/SessionStorage';
 import axios from 'axios';
+import { PaginationDto } from 'dtos/pagination.dto';
+import { RoomDto } from 'dtos/room.dto';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_CHAT_ENDPOINT,
 });
 
-interface ICreateRoomDTO {
+interface ICreateRoomDto {
   name: string;
   description?: string;
   password?: string;
@@ -13,9 +15,14 @@ interface ICreateRoomDTO {
   maxUsers: number;
 }
 
-interface IUpdateRoomDTO extends ICreateRoomDTO {}
+interface IUpdateRoomDto extends ICreateRoomDto {}
 
-export const createRoom = async (data: ICreateRoomDTO) => {
+type ListRoomsDto = {
+  data: RoomDto[];
+  meta: PaginationDto;
+};
+
+export const createRoom = async (data: ICreateRoomDto) => {
   const accessToken = SessionStorage.get('access');
 
   const response = await api.post('/room', data, {
@@ -30,7 +37,7 @@ export const createRoom = async (data: ICreateRoomDTO) => {
 export const listRooms = async () => {
   const accessToken = SessionStorage.get('access');
 
-  const response = await api.get('/room', {
+  const response = await api.get<ListRoomsDto>('/room', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -51,7 +58,7 @@ export const deleteRoom = async (roomId: string) => {
   return response;
 };
 
-export const updateRoom = async (roomId: string, data: IUpdateRoomDTO) => {
+export const updateRoom = async (roomId: string, data: IUpdateRoomDto) => {
   const accessToken = SessionStorage.get('access');
 
   const response = await api.patch(`/room/${roomId}`, {

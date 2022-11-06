@@ -62,7 +62,6 @@ export function Login() {
   };
 
   useEffect(() => {
-    console.log(user);
     if (user) navigate(decodeURIComponent(params.redirect));
   }, [processedAuth]);
 
