@@ -11,9 +11,18 @@ export function Template({ children }: TemplateProps) {
   const { user } = useUser();
 
   return (
-    <Box display="flex" w="100vw" h="100vh" bg="gray.700" pos="relative">
-      {user && <Header />}
-      {children};
+    <Box
+      display="flex"
+      flexDir="column"
+      w="100vw"
+      h="100vh"
+      bg="gray.700"
+      alignItems="center"
+    >
+      <Header />
+      <Box display="flex" w="1080px" h="100%" px={4} mt={4}>
+        {children};
+      </Box>
     </Box>
   );
 }

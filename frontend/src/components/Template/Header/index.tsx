@@ -52,9 +52,6 @@ export function Header() {
   return (
     <Stack
       direction="row"
-      pos="absolute"
-      top={0}
-      position="fixed"
       bg="gray.800"
       w="100%"
       height="72px"
