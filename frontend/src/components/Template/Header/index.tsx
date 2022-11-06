@@ -13,18 +13,41 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { useUser } from '../../../contexts/User';
-import LocalStorage from '../../../helpers/LocalStorage';
-import SessionStorage from '../../../helpers/SessionStorage';
+import { useUser } from '@contexts/User';
+import LocalStorage from '@helpers/LocalStorage';
+import SessionStorage from '@helpers/SessionStorage';
+import { me } from '@services/auth';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function Header() {
-  const { user } = useUser();
+  const { user, setUser, setProcessedAuth } = useUser();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     LocalStorage.clear();
     SessionStorage.clear();
-    window.location.reload();
+    setUser(null);
+    navigate('/auth/login');
   };
+
+  useEffect(() => {
+    async function verifyUser() {
+      if (!user) {
+        try {
+          const { data } = await me();
+          setUser(data);
+        } catch (error: any) {
+          // eslint-disable-next-line no-console
+          console.error(error);
+        } finally {
+          setProcessedAuth(true);
+        }
+      }
+    }
+
+    verifyUser();
+  }, []);
 
   return (
     <Stack

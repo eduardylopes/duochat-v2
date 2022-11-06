@@ -1,7 +1,7 @@
 import { Box, Spinner } from '@chakra-ui/react';
+import { useUser } from '@contexts/User';
 import { ReactElement, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useUser } from '../../contexts/User';
 
 type GuardProps = {
   element: ReactElement;
@@ -18,7 +18,8 @@ export function Guard({ element }: GuardProps) {
     const execute = async () => {
       if (!processedAuth || loading) {
         setLoading(false);
-        return;
+      } else {
+        setLoading(true);
       }
 
       if (!user) {
@@ -31,8 +32,14 @@ export function Guard({ element }: GuardProps) {
   }, [processedAuth]);
 
   return (
-    <Box w="100%" h="100%">
-      {loading ? element : <Spinner size="xl" />}
+    <Box
+      display="flex"
+      w="100%"
+      h="100%"
+      alignItems="center"
+      justifyContent="center"
+    >
+      {loading ? <Spinner size="xl" /> : element}
     </Box>
   );
 }

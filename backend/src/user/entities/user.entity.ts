@@ -24,12 +24,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
-  avatar: string;
-
-  @Column({ name: 'is_admin' })
-  isAdmin: boolean;
-
   @CreateDateColumn({
     type: 'timestamp without time zone',
     default: () => 'CURRENT_TIMESTAMP',

@@ -1,6 +1,6 @@
+import LocalStorage from '@helpers/LocalStorage';
+import SessionStorage from '@helpers/SessionStorage';
 import axios from 'axios';
-import LocalStorage from '../helpers/LocalStorage';
-import SessionStorage from '../helpers/SessionStorage';
 
 interface ITokenResponse {
   accessToken: string;

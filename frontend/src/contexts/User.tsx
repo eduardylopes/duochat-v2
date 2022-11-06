@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 
 interface IUserContext {
   user: IUser | null;
-  setUser: (user: IUser) => void;
+  setUser: (user: IUser | null) => void;
   processedAuth: boolean;
   setProcessedAuth: (processedAuth: boolean) => void;
 }
