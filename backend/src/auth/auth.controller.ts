@@ -10,7 +10,7 @@ import {
 
 import { AuthService } from './auth.service';
 
-import { LocalAuthGuard } from '../guards/local-auth.guard';
+import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';

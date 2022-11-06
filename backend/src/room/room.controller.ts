@@ -17,7 +17,7 @@ import { RoomService } from './room.service';
 
 import { PageOptionsDto } from 'src/common/dtos/page-options.dto';
 import { PageDto } from 'src/common/dtos/page.dto';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreateRoomRequestDto } from './dto/create-room-request-dto';
 import { RoomDto } from './dto/room.dto';
 import { OwnershipGuard } from './guards/ownership.guard';
